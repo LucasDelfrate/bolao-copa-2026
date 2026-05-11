@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build -- --configuration production",
+  "outputDirectory": "dist/bolao-copa-2026",
+  "rewrites": [
+    { "source": "/api/teams", "destination": "/api/teams" },
+    { "source": "/api/scoreboard", "destination": "/api/scoreboard" },
+    { "source": "/api/groups", "destination": "/api/groups" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}

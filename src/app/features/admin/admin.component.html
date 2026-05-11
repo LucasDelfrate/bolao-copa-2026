@@ -1,0 +1,76 @@
+<section class="page container">
+  <header class="page-header">
+    <span class="badge badge-red">Admin</span>
+    <h1>Painel de convites</h1>
+    <p class="page-sub">Gere e gerencie os códigos de acesso ao bolão.</p>
+  </header>
+
+  <!-- Gerador -->
+  <div class="generator card">
+    <h3>Gerar novo código</h3>
+    <p>Informe para quem é o código (ex: "Lucas", "Tia Maria").</p>
+
+    <div class="gen-row">
+      <input
+        type="text"
+        class="label-input"
+        [(ngModel)]="newLabel"
+        placeholder="Nome do convidado"
+        maxlength="40"
+        (keyup.enter)="generate()"
+        [disabled]="loading"
+      />
+      <button class="btn btn-primary" (click)="generate()" [disabled]="loading || !newLabel.trim()">
+        <span *ngIf="!loading">Gerar código</span>
+        <span *ngIf="loading">Gerando…</span>
+      </button>
+    </div>
+
+    <p class="error" *ngIf="error">⚠️ {{ error }}</p>
+
+    <div class="generated-code" *ngIf="generatedCode">
+      <span class="code-display">{{ generatedCode }}</span>
+      <button class="btn btn-ghost btn-sm" (click)="copyCode(generatedCode)">
+        📋 Copiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de códigos -->
+  <div class="codes-section">
+    <h3>Códigos gerados <span class="count">{{ codes.length }}</span></h3>
+
+    <div *ngIf="!codes.length" class="empty">Nenhum código gerado ainda.</div>
+
+    <div class="codes-list" *ngIf="codes.length">
+      <div
+        *ngFor="let c of codes; trackBy: trackCode"
+        class="code-row card"
+        [class.used]="c.usedAt"
+      >
+        <div class="code-left">
+          <span class="code-text">{{ c.code }}</span>
+          <span class="code-label">{{ c.label }}</span>
+        </div>
+
+        <div class="code-status">
+          <span class="badge" [ngClass]="c.usedAt ? 'badge-muted' : 'badge-green'">
+            {{ c.usedAt ? 'Usado' : 'Disponível' }}
+          </span>
+          <small *ngIf="c.usedAt" class="used-by">
+            por {{ c.usedByName }}
+          </small>
+        </div>
+
+        <div class="code-actions">
+          <button class="btn btn-ghost btn-sm" (click)="copyCode(c.code)" [disabled]="!!c.usedAt">
+            📋
+          </button>
+          <button class="btn btn-danger btn-sm" (click)="revoke(c.code)">
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

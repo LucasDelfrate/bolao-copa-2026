@@ -1,0 +1,222 @@
+<section class="page container">
+
+  <div class="ranking-layout">
+
+    <!-- Coluna esquerda: premiação -->
+    <aside class="prize-panel">
+      <div class="prize-header">
+        <span class="prize-crown">🏆</span>
+        <h2 class="prize-title">Premiação</h2>
+        <p class="prize-sub">Copa 2026</p>
+      </div>
+
+      <div class="prize-pot">
+        <span class="pot-label">Prêmio total</span>
+        <span class="pot-value">R$ {{ totalPot }}</span>
+        <span class="pot-meta">{{ playerCount }} jogador{{ playerCount !== 1 ? 'es' : '' }} × R$ {{ entryFee }}</span>
+      </div>
+
+      <div class="prize-list">
+        <div
+          class="prize-item"
+          *ngFor="let p of prizes"
+          [class]="'prize-item ' + p.color"
+        >
+          <div class="prize-place">
+            <span class="prize-emoji">{{ p.emoji }}</span>
+            <span class="prize-place-label">{{ p.label }}</span>
+          </div>
+          <div class="prize-right">
+            <span class="prize-amount">R$ {{ prizeAmount(p.pct) }}</span>
+            <span class="prize-pct">{{ p.pct * 100 | number:'1.0-0' }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="prize-note">* Valor calculado com base nos inscritos confirmados.</p>
+    </aside>
+
+    <!-- Coluna direita: ranking -->
+    <div class="ranking-col">
+      <header class="page-header">
+        <span class="badge badge-gold">Ranking</span>
+        <h1>Quem manda no bolão</h1>
+        <p class="page-sub">
+          Pontuação atualizada a cada jogo finalizado. Empate é desempatado por
+          cravadas e depois por menos erros.
+        </p>
+      </header>
+
+      <div *ngIf="loading" class="loading">Calculando pontuações…</div>
+      <div *ngIf="error && !loading" class="error">⚠️ {{ error }}</div>
+
+      <div *ngIf="!loading && !error">
+        <div *ngIf="!ranking.length" class="empty">Nenhum participante ainda.</div>
+
+        <ol class="ranking-list" *ngIf="ranking.length">
+          <li
+            *ngFor="let entry of ranking; trackBy: trackByUid"
+            class="rank-row"
+            [ngClass]="positionClass(entry.position)"
+          >
+            <div class="rank-position">
+              <span class="emoji">{{ positionEmoji(entry.position) }}</span>
+              <span class="num">#{{ entry.position }}</span>
+            </div>
+
+            <img
+              class="rank-avatar"
+              [src]="entry.photoURL"
+              [alt]="entry.displayName"
+              referrerpolicy="no-referrer"
+            />
+
+            <div class="rank-info">
+              <strong>{{ entry.displayName }}</strong>
+              <small>
+                {{ entry.exactScores }} cravadas · {{ entry.correctWinners }} acertos
+              </small>
+            </div>
+
+            <div class="rank-points">
+              <span class="value">{{ entry.totalPoints }}</span>
+              <small>pts</small>
+            </div>
+
+            <button class="detail-btn" (click)="openDetail(entry)" title="Ver detalhes">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6"/>
+              </svg>
+            </button>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal de detalhes -->
+<div class="modal-backdrop" *ngIf="detailEntry" (click)="closeDetail()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-user">
+        <img [src]="detailEntry.photoURL" [alt]="detailEntry.displayName" referrerpolicy="no-referrer" />
+        <div>
+          <strong>{{ detailEntry.displayName }}</strong>
+          <span class="modal-total">{{ detailEntry.totalPoints }} pts</span>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeDetail()">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="detailEntry.breakdown as bd">
+
+      <!-- Fase de Grupos -->
+      <div class="breakdown-section">
+        <div class="breakdown-section-header">
+          <p class="breakdown-section-title">⚽ Fase de Grupos</p>
+          <span class="phase-subtotal" [class.pos]="bd.groups.subtotal > 0" [class.neg]="bd.groups.subtotal < 0">
+            {{ bd.groups.subtotal > 0 ? '+' : '' }}{{ bd.groups.subtotal }} pts
+          </span>
+        </div>
+        <ng-container *ngTemplateOutlet="phaseRows; context: { $implicit: bd.groups }"></ng-container>
+      </div>
+
+      <!-- Mata-mata -->
+      <div class="breakdown-section">
+        <div class="breakdown-section-header">
+          <p class="breakdown-section-title">🏟️ Mata-mata</p>
+          <span class="phase-subtotal" [class.pos]="bd.knockout.subtotal > 0" [class.neg]="bd.knockout.subtotal < 0">
+            {{ bd.knockout.subtotal > 0 ? '+' : '' }}{{ bd.knockout.subtotal }} pts
+          </span>
+        </div>
+        <ng-container *ngTemplateOutlet="phaseRows; context: { $implicit: bd.knockout }"></ng-container>
+      </div>
+
+      <!-- Bônus -->
+      <div class="breakdown-section" *ngIf="bd.podiumPicks > 0 || bd.championBonus > 0">
+        <p class="breakdown-section-title">🏆 Bônus</p>
+
+        <div class="breakdown-row" *ngIf="bd.podiumPicks > 0">
+          <div class="breakdown-left">
+            <span class="dot gold"></span>
+            <span class="breakdown-label">Semifinalistas acertados</span>
+            <span class="breakdown-count">{{ bd.podiumPicks }}×</span>
+          </div>
+          <span class="breakdown-pts positive">+{{ bd.podiumPicksPoints }}</span>
+        </div>
+
+        <div class="breakdown-row" *ngIf="bd.championBonus > 0">
+          <div class="breakdown-left">
+            <span class="dot gold"></span>
+            <span class="breakdown-label">Campeão pré-Copa</span>
+          </div>
+          <span class="breakdown-pts positive">+{{ bd.championBonus }}</span>
+        </div>
+      </div>
+
+      <div class="breakdown-total">
+        <span>Total</span>
+        <span class="total-value">{{ bd.total }} pts</span>
+      </div>
+    </div>
+
+    <!-- Template reutilizável de linhas por fase -->
+    <ng-template #phaseRows let-p>
+      <div class="breakdown-row" *ngIf="p.exactScores > 0">
+        <div class="breakdown-left">
+          <span class="dot green"></span>
+          <span class="breakdown-label">Placar exato</span>
+          <span class="breakdown-count">{{ p.exactScores }}×</span>
+        </div>
+        <span class="breakdown-pts positive">+{{ p.exactScoresPoints }}</span>
+      </div>
+      <div class="breakdown-row" *ngIf="p.exactDraws > 0">
+        <div class="breakdown-left">
+          <span class="dot green"></span>
+          <span class="breakdown-label">Empate exato</span>
+          <span class="breakdown-count">{{ p.exactDraws }}×</span>
+        </div>
+        <span class="breakdown-pts positive">+{{ p.exactDrawsPoints }}</span>
+      </div>
+      <div class="breakdown-row" *ngIf="p.correctWinnerAndOneScore > 0">
+        <div class="breakdown-left">
+          <span class="dot teal"></span>
+          <span class="breakdown-label">Ganhador + um placar</span>
+          <span class="breakdown-count">{{ p.correctWinnerAndOneScore }}×</span>
+        </div>
+        <span class="breakdown-pts positive">+{{ p.correctWinnerAndOneScorePoints }}</span>
+      </div>
+      <div class="breakdown-row" *ngIf="p.correctWinners > 0">
+        <div class="breakdown-left">
+          <span class="dot blue"></span>
+          <span class="breakdown-label">Só o ganhador</span>
+          <span class="breakdown-count">{{ p.correctWinners }}×</span>
+        </div>
+        <span class="breakdown-pts positive">+{{ p.correctWinnersPoints }}</span>
+      </div>
+      <div class="breakdown-row" *ngIf="p.correctDraws > 0">
+        <div class="breakdown-left">
+          <span class="dot blue"></span>
+          <span class="breakdown-label">Empate (placar errado)</span>
+          <span class="breakdown-count">{{ p.correctDraws }}×</span>
+        </div>
+        <span class="breakdown-pts positive">+{{ p.correctDrawsPoints }}</span>
+      </div>
+      <div class="breakdown-row" *ngIf="p.wrongWinners > 0 && p.wrongWinnersPoints !== 0">
+        <div class="breakdown-left">
+          <span class="dot red"></span>
+          <span class="breakdown-label">Errou o ganhador</span>
+          <span class="breakdown-count">{{ p.wrongWinners }}×</span>
+        </div>
+        <span class="breakdown-pts negative">{{ p.wrongWinnersPoints }}</span>
+      </div>
+      <div class="breakdown-empty"
+        *ngIf="p.exactScores === 0 && p.exactDraws === 0 && p.correctWinnerAndOneScore === 0
+               && p.correctWinners === 0 && p.correctDraws === 0 && p.wrongWinners === 0">
+        Nenhum resultado ainda.
+      </div>
+    </ng-template>
+  </div>
+</div>

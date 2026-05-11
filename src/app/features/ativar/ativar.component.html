@@ -1,0 +1,53 @@
+<section class="ativar-screen">
+  <div class="ativar-card card animate-in">
+
+    <div *ngIf="!success">
+      <div class="ativar-icon">🎟️</div>
+      <h2>Código de acesso</h2>
+      <p class="ativar-sub">
+        Este bolão é privado. Insira o código que você recebeu para liberar seu acesso.
+      </p>
+
+      <div class="input-group">
+        <input
+          type="text"
+          class="code-field"
+          [(ngModel)]="code"
+          placeholder="XXXX-XXXX"
+          maxlength="9"
+          (keyup.enter)="redeem()"
+          [disabled]="loading"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button
+          class="btn btn-gold"
+          (click)="redeem()"
+          [disabled]="loading || !code.trim()"
+        >
+          <span *ngIf="!loading">Ativar</span>
+          <span *ngIf="loading">Verificando…</span>
+        </button>
+      </div>
+
+      <p class="error" *ngIf="error">⚠️ {{ error }}</p>
+
+      <button class="btn-link" (click)="logout()">Sair da conta</button>
+    </div>
+
+    <div *ngIf="success" class="success-state">
+      <div class="success-icon">✅</div>
+      <h2>Acesso liberado!</h2>
+      <p>Bem-vindo ao bolão. Redirecionando…</p>
+    </div>
+
+  </div>
+</section>
+
+<div class="guarantee-card">
+  <span class="guarantee-icon">🛡️</span>
+  <div class="guarantee-text">
+    <strong>Sem riscos</strong>
+    <p>Se houver qualquer problema técnico ou imprevisto durante a Copa, o valor da inscrição será integralmente devolvido.</p>
+  </div>
+</div>

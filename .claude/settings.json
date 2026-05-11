@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:site.api.espn.com)",
+      "PowerShell(cd c:\\\\delfrate\\\\bolao-copa-2026; $job = Start-Job { node api/server.js }; Start-Sleep 3; Invoke-RestMethod http://localhost:3000/api/groups | ConvertTo-Json -Depth 2; Stop-Job $job; Remove-Job $job)",
+      "PowerShell(netstat -ano)",
+      "PowerShell(cd c:\\\\delfrate\\\\bolao-copa-2026; Start-Process node -ArgumentList \"api/server.js\" -PassThru | Select-Object Id; Start-Sleep 4; try { Invoke-RestMethod http://localhost:3001/api/groups } catch { $_.Exception.Message })",
+      "PowerShell(try { Invoke-RestMethod http://localhost:3001/api/groups | ConvertTo-Json -Depth 3 } catch { $_.Exception.Message })",
+      "PowerShell(try { Invoke-RestMethod http://localhost:3001/api/groups/1 | ConvertTo-Json -Depth 2 } catch { $_.Exception.Message })",
+      "Bash(node -e ' *)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}

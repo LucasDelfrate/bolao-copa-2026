@@ -1,0 +1,37 @@
+<header class="app-header">
+  <div class="container header-inner">
+    <a routerLink="/grupos" class="brand" (click)="closeMenu()">
+      <span class="brand-mark">⚽</span>
+      <span class="brand-text">
+        <strong>Bolão</strong>
+        <small>Copa 2026</small>
+      </span>
+    </a>
+
+    <button class="hamburger" (click)="toggleMenu()" aria-label="Menu">
+      <span [class.open]="menuOpen"></span>
+      <span [class.open]="menuOpen"></span>
+      <span [class.open]="menuOpen"></span>
+    </button>
+
+    <nav class="nav" [class.open]="menuOpen">
+      <a routerLink="/grupos" routerLinkActive="active" (click)="closeMenu()">Grupos</a>
+      <a routerLink="/mata-mata" routerLinkActive="active" (click)="closeMenu()">Mata-mata</a>
+      <a routerLink="/ranking" routerLinkActive="active" (click)="closeMenu()">Ranking</a>
+      <a routerLink="/regras" routerLinkActive="active" (click)="closeMenu()">Regras</a>
+      <a
+        *ngIf="user.isAdmin"
+        routerLink="/admin"
+        routerLinkActive="active"
+        class="admin-link"
+        (click)="closeMenu()"
+      >🔑 Admin</a>
+
+      <div class="user-chip">
+        <img [src]="user.photoURL" [alt]="user.displayName" referrerpolicy="no-referrer" />
+        <span>{{ user.displayName }}</span>
+        <button class="logout" (click)="logout()" title="Sair">⏻</button>
+      </div>
+    </nav>
+  </div>
+</header>

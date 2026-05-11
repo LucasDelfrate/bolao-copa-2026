@@ -1,0 +1,54 @@
+<section class="page container">
+  <header class="page-header">
+    <span class="badge badge-green">Pontuação</span>
+    <h1>Regras do Bolão</h1>
+    <p class="page-sub">Entenda como os pontos são calculados em cada fase da Copa.</p>
+  </header>
+
+  <div class="sections">
+    <div class="section card" *ngFor="let section of sections">
+      <div class="section-header">
+        <span class="section-icon">{{ section.icon }}</span>
+        <h2 class="section-title">{{ section.title }}</h2>
+      </div>
+
+      <div class="rules-list">
+        <div
+          class="rule-row"
+          *ngFor="let rule of section.rules"
+          [class.positive]="rule.type === 'positive'"
+          [class.negative]="rule.type === 'negative'"
+        >
+          <div class="rule-info">
+            <span class="rule-label">{{ rule.label }}</span>
+            <span class="rule-desc">{{ rule.description }}</span>
+          </div>
+          <div class="rule-points">
+            <span class="points-badge" [class.neg]="rule.type === 'negative'">
+              {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
+            </span>
+            <span class="pts-label">pts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="example-card card">
+    <h3>📌 Exemplo Prático</h3>
+    <p>
+      Você apostou <strong>Espanha 2×1 Portugal</strong> e o resultado foi
+      <strong>Espanha 3×1</strong>. Você acertou o ganhador (Espanha) e um dos
+      placares (o "1" de Portugal) → <span class="highlight">+4 pts</span>.
+    </p>
+    <p>
+      Você também previu Espanha como 1º colocado do grupo e ela ficou em 2º →
+      acertou o classificado mas na posição errada → <span class="highlight">+2 pts</span>.
+    </p>
+    <p>
+      No mata-mata, você apostou empate 1×1 e deu 1×1, mas errou quem avançaria nos
+      pênaltis → <span class="highlight">+7 pts</span> pelo empate cravado,
+      <span class="neg-highlight">sem bônus</span> de classificação.
+    </p>
+  </div>
+</section>

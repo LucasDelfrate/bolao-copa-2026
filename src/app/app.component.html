@@ -1,0 +1,4 @@
+<app-header *ngIf="(user$ | async) as user" [user]="user"></app-header>
+<main>
+  <router-outlet></router-outlet>
+</main>

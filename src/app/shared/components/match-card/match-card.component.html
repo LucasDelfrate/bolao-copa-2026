@@ -1,0 +1,125 @@
+<article class="match-card" [class.locked]="locked">
+  <header class="match-meta">
+    <span class="badge" [ngClass]="statusBadgeClass">{{ statusLabel }}</span>
+    <span class="venue" *ngIf="match.venue">📍 {{ match.venue }}</span>
+  </header>
+
+  <div class="match-body">
+    <div class="team home">
+      <img
+        *ngIf="homeTeam"
+        [src]="homeTeam.logo"
+        [alt]="homeTeam.name"
+        class="team-logo"
+        referrerpolicy="no-referrer"
+      />
+      <strong class="team-name">{{ homeTeam?.name || '—' }}</strong>
+      <span class="team-abbr">{{ homeTeam?.abbreviation }}</span>
+    </div>
+
+    <div class="score-area">
+      <div class="real-score" *ngIf="hasResult">
+        <span>{{ match.homeScore }}</span>
+        <em>×</em>
+        <span>{{ match.awayScore }}</span>
+        <small>resultado</small>
+      </div>
+
+      <div class="palpite-inputs" [class.with-result]="hasResult">
+        <input
+          type="number"
+          class="score-input"
+          [(ngModel)]="scoreHome"
+          (change)="onChange()"
+          [disabled]="locked"
+          min="0"
+          max="20"
+          aria-label="Gols da casa"
+        />
+        <span class="vs">×</span>
+        <input
+          type="number"
+          class="score-input"
+          [(ngModel)]="scoreAway"
+          (change)="onChange()"
+          [disabled]="locked"
+          min="0"
+          max="20"
+          aria-label="Gols visitante"
+        />
+      </div>
+
+      <small class="palpite-label">seu palpite</small>
+
+      <span
+        *ngIf="earnedPoints !== null"
+        class="points-pill"
+        [class.positive]="earnedPoints > 0"
+        [class.negative]="earnedPoints < 0"
+        [class.zero]="earnedPoints === 0"
+      >
+        {{ earnedPoints > 0 ? '+' : '' }}{{ earnedPoints }} pts
+      </span>
+    </div>
+
+    <div class="team away">
+      <img
+        *ngIf="awayTeam"
+        [src]="awayTeam.logo"
+        [alt]="awayTeam.name"
+        class="team-logo"
+        referrerpolicy="no-referrer"
+      />
+      <strong class="team-name">{{ awayTeam?.name || '—' }}</strong>
+      <span class="team-abbr">{{ awayTeam?.abbreviation }}</span>
+    </div>
+  </div>
+
+  <!-- Seletor de desempate — aparece só no mata-mata quando o palpite é empate -->
+  <div class="tiebreak-row" *ngIf="showTiebreak">
+    <span class="tiebreak-label">Quem avança nos pênaltis?</span>
+    <div class="tiebreak-btns">
+      <button
+        class="tiebreak-btn"
+        [class.selected]="tiebreakTeamId === match.homeTeamId"
+        (click)="selectTiebreak(match.homeTeamId)"
+      >
+        <img *ngIf="homeTeam" [src]="homeTeam.logo" [alt]="homeTeam.name" referrerpolicy="no-referrer" />
+        <span>{{ homeTeam?.abbreviation || homeTeam?.name }}</span>
+      </button>
+      <span class="tiebreak-sep">ou</span>
+      <button
+        class="tiebreak-btn"
+        [class.selected]="tiebreakTeamId === match.awayTeamId"
+        (click)="selectTiebreak(match.awayTeamId)"
+      >
+        <img *ngIf="awayTeam" [src]="awayTeam.logo" [alt]="awayTeam.name" referrerpolicy="no-referrer" />
+        <span>{{ awayTeam?.abbreviation || awayTeam?.name }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tiebreak salvo (quando travado) -->
+  <div class="tiebreak-saved" *ngIf="isKnockout && locked && palpite?.tiebreakTeamId">
+    <span class="tiebreak-label">Avança nos pênaltis:</span>
+    <span class="tiebreak-chosen">
+      <img
+        *ngIf="tiebreakTeamId === match.homeTeamId && homeTeam"
+        [src]="homeTeam.logo"
+        [alt]="homeTeam.name"
+        referrerpolicy="no-referrer"
+      />
+      <img
+        *ngIf="tiebreakTeamId === match.awayTeamId && awayTeam"
+        [src]="awayTeam.logo"
+        [alt]="awayTeam.name"
+        referrerpolicy="no-referrer"
+      />
+      {{ tiebreakTeamId === match.homeTeamId ? homeTeam?.name : awayTeam?.name }}
+    </span>
+  </div>
+
+  <footer class="match-foot" *ngIf="locked">
+    <span class="lock">🔒 Palpites travados</span>
+  </footer>
+</article>
