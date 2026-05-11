@@ -11,6 +11,7 @@ interface GroupView {
   teams: Team[];
   matches: Match[];
   standings: StandingRow[];
+  forecastStandings: StandingRow[];
 }
 
 @Component({
@@ -52,7 +53,7 @@ export class GruposComponent implements OnInit {
       this.uid = user.uid;
       this.loadData();
       this.palpites.getBracket(this.uid).pipe(take(1)).subscribe((b) => {
-        this.championId = b?.championTeamId ?? null;
+        this.championId = b?.groupChampionTeamId ?? null;
       });
     });
   }
@@ -89,7 +90,7 @@ export class GruposComponent implements OnInit {
     this.championId = this.championIdTemp;
     this.championSaving = true;
     this.palpites
-      .saveBracket(this.uid, { championTeamId: this.championIdTemp })
+      .saveBracket(this.uid, { groupChampionTeamId: this.championIdTemp })
       .finally(() => (this.championSaving = false));
     this.closeChampionModal();
   }
@@ -119,6 +120,14 @@ export class GruposComponent implements OnInit {
 
   onPalpite(event: { matchId: string; scoreHome: number; scoreAway: number; tiebreakTeamId?: string }): void {
     if (this.phaseLocked) return;
+    // Optimistic update for forecast
+    const existing = this.palpitesByMatchId.get(event.matchId);
+    this.palpitesByMatchId.set(event.matchId, {
+      ...(existing ?? { id: `${this.uid}_${event.matchId}`, uid: this.uid, matchId: event.matchId, phase: 'group-stage', updatedAt: Date.now() }),
+      scoreHome: event.scoreHome,
+      scoreAway: event.scoreAway,
+    });
+    this.rebuildForecasts();
     this.palpites
       .savePalpite({
         uid: this.uid,
@@ -136,6 +145,55 @@ export class GruposComponent implements OnInit {
 
   trackMatch(_i: number, match: Match): string {
     return match.id;
+  }
+
+  get selectedGroupForecast(): StandingRow[] {
+    return this.selectedGroup?.forecastStandings ?? [];
+  }
+
+  get forecastHasPalpites(): boolean {
+    return this.selectedGroupForecast.some((r) => r.played > 0);
+  }
+
+  private rebuildForecasts(): void {
+    this.groupViews = this.groupViews.map((gv) => ({
+      ...gv,
+      forecastStandings: this.computeForecastStandings(gv.matches, gv.group.teamIds),
+    }));
+  }
+
+  private computeForecastStandings(matches: Match[], teamIds: string[]): StandingRow[] {
+    const stats = new Map<string, StandingRow>();
+    for (const id of teamIds) {
+      stats.set(id, { teamId: id, pos: 0, played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDiff: 0, points: 0, advancing: false });
+    }
+    for (const m of matches) {
+      const palpite = this.palpitesByMatchId.get(m.id);
+      // Use real score if finished, else palpite score
+      let homeScore: number | null = null;
+      let awayScore: number | null = null;
+      if (m.status === 'finished' && m.homeScore !== null && m.awayScore !== null) {
+        homeScore = m.homeScore;
+        awayScore = m.awayScore;
+      } else if (palpite) {
+        homeScore = palpite.scoreHome;
+        awayScore = palpite.scoreAway;
+      }
+      if (homeScore === null || awayScore === null) continue;
+      const home = stats.get(m.homeTeamId);
+      const away = stats.get(m.awayTeamId);
+      if (!home || !away) continue;
+      home.played++; away.played++;
+      home.goalsFor += homeScore; home.goalsAgainst += awayScore;
+      away.goalsFor += awayScore; away.goalsAgainst += homeScore;
+      if (homeScore > awayScore) { home.won++; home.points += 3; away.lost++; }
+      else if (homeScore < awayScore) { away.won++; away.points += 3; home.lost++; }
+      else { home.drawn++; home.points++; away.drawn++; away.points++; }
+    }
+    const rows = [...stats.values()].map((r) => ({ ...r, goalDiff: r.goalsFor - r.goalsAgainst }));
+    rows.sort((a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor);
+    rows.forEach((r, i) => { r.pos = i + 1; r.advancing = i < 2; });
+    return rows;
   }
 
   private computeStandings(matches: Match[], teamIds: string[]): StandingRow[] {
@@ -192,6 +250,7 @@ export class GruposComponent implements OnInit {
                   .filter((t): t is Team => !!t),
                 matches: groupMatches,
                 standings: this.computeStandings(groupMatches, group.teamIds),
+                forecastStandings: [],
               };
             })
             .sort((a, b) => a.group.letter.localeCompare(b.group.letter));
@@ -214,6 +273,7 @@ export class GruposComponent implements OnInit {
       .subscribe({
         next: (palpites) => {
           this.palpitesByMatchId = new Map(palpites.map((p) => [p.matchId, p]));
+          this.rebuildForecasts();
           this.loading = false;
         },
         error: (err) => {

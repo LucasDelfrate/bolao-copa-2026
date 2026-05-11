@@ -55,6 +55,20 @@ export class PalpitesService {
     await batch.commit();
   }
 
+  async clearAllDataForUser(uid: string): Promise<void> {
+    const [palpitesSnap, bracketSnap] = await Promise.all([
+      this.afs
+        .collection<Palpite>('palpites', (ref) => ref.where('uid', '==', uid))
+        .get()
+        .toPromise(),
+      this.afs.collection('bracket').doc(uid).get().toPromise(),
+    ]);
+    const batch = this.afs.firestore.batch();
+    palpitesSnap?.docs.forEach((d) => batch.delete(d.ref));
+    if (bracketSnap?.exists) batch.delete(bracketSnap.ref);
+    await batch.commit();
+  }
+
   async saveBracket(uid: string, bracket: Partial<BracketBonus>): Promise<void> {
     const data: BracketBonus = {
       uid,

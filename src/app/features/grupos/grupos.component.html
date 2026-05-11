@@ -1,5 +1,4 @@
 <section class="page container">
-
   <div *ngIf="loading" class="loading">Carregando dados da Copa…</div>
   <div *ngIf="error && !loading" class="error">⚠️ {{ error }}</div>
 
@@ -7,7 +6,7 @@
     <div class="top-row">
       <!-- Champion section — canto esquerdo, mesma altura do header -->
       <div class="champion-section">
-        <p class="champion-title">🏆 Escolha o <strong>Campeão</strong></p>
+        <p class="champion-title">🏆 Crave o <strong>Campeão</strong></p>
 
         <button
           *ngIf="!championTeam && !phaseLocked"
@@ -19,17 +18,43 @@
         </button>
 
         <div class="champion-box filled-box" *ngIf="championTeam">
-          <img [src]="championTeam.logo" [alt]="championTeam.name" referrerpolicy="no-referrer" />
+          <img
+            [src]="championTeam.logo"
+            [alt]="championTeam.name"
+            referrerpolicy="no-referrer"
+          />
           <span class="champion-team-name">{{ championTeam.name }}</span>
-          <button *ngIf="!phaseLocked" class="edit-btn" (click)="openChampionModal()" title="Editar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          <button
+            *ngIf="!phaseLocked"
+            class="edit-btn"
+            (click)="openChampionModal()"
+            title="Editar"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+              />
+              <path
+                d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+              />
             </svg>
           </button>
         </div>
 
-        <div class="champion-box locked-box" *ngIf="!championTeam && phaseLocked">
+        <div
+          class="champion-box locked-box"
+          *ngIf="!championTeam && phaseLocked"
+        >
           <span class="locked-dash">—</span>
         </div>
       </div>
@@ -40,7 +65,9 @@
         <h1>Palpites por grupo</h1>
         <p class="page-sub">
           <ng-container *ngIf="!phaseLocked && firstMatchDate">
-            ⏳ Você pode editar seus palpites até <strong>{{ firstMatchLabel }}</strong>.
+            ⏳ Você pode editar seus palpites até
+            <strong>{{ firstMatchLabel }}</strong
+            >.
           </ng-container>
           <ng-container *ngIf="phaseLocked">
             🔒 A fase de grupos começou — palpites estão travados.
@@ -56,10 +83,21 @@
           (click)="openClearModal()"
           title="Limpar palpites da fase de grupos"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-            <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14H6L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4h6v2" />
           </svg>
           Limpar palpites
         </button>
@@ -67,7 +105,11 @@
     </div>
 
     <!-- Modal de confirmação de limpeza -->
-    <div class="modal-backdrop" *ngIf="clearModalOpen" (click)="closeClearModal()">
+    <div
+      class="modal-backdrop"
+      *ngIf="clearModalOpen"
+      (click)="closeClearModal()"
+    >
       <div class="modal-panel card" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h3>Limpar palpites</h3>
@@ -75,23 +117,37 @@
         </div>
         <div class="clear-modal-body">
           <span class="clear-modal-icon">🗑️</span>
-          <p>Isso irá apagar <strong>todos os palpites da fase de grupos</strong> que você preencheu.</p>
+          <p>
+            Isso irá apagar
+            <strong>todos os palpites da fase de grupos</strong> que você
+            preencheu.
+          </p>
           <p class="clear-modal-warn">Essa ação não pode ser desfeita.</p>
         </div>
         <div class="modal-footer">
-          <button class="btn-cancel" (click)="closeClearModal()">Cancelar</button>
-          <button class="btn-danger" [disabled]="clearLoading" (click)="confirmClear()">
-            {{ clearLoading ? 'Limpando…' : 'Sim, limpar tudo' }}
+          <button class="btn-cancel" (click)="closeClearModal()">
+            Cancelar
+          </button>
+          <button
+            class="btn-danger"
+            [disabled]="clearLoading"
+            (click)="confirmClear()"
+          >
+            {{ clearLoading ? "Limpando…" : "Sim, limpar tudo" }}
           </button>
         </div>
       </div>
     </div>
 
     <!-- Modal -->
-    <div class="modal-backdrop" *ngIf="championModalOpen" (click)="closeChampionModal()">
+    <div
+      class="modal-backdrop"
+      *ngIf="championModalOpen"
+      (click)="closeChampionModal()"
+    >
       <div class="modal-panel card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h3>Escolha o Campeão</h3>
+          <h3>Crave o Campeão</h3>
           <button class="modal-close" (click)="closeChampionModal()">✕</button>
         </div>
         <input
@@ -115,7 +171,11 @@
           </button>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" [disabled]="!championIdTemp" (click)="confirmChampion()">
+          <button
+            class="btn btn-primary"
+            [disabled]="!championIdTemp"
+            (click)="confirmChampion()"
+          >
             Confirmar
           </button>
         </div>
@@ -143,46 +203,139 @@
 
     <div class="group-content" *ngIf="selectedGroup as gv">
       <div class="group-layout">
-        <div class="standings-panel card">
-          <h3 class="standings-title">Classificação</h3>
-          <table class="standings-table">
-            <thead>
-              <tr>
-                <th class="col-pos">#</th>
-                <th class="col-team">Seleção</th>
-                <th class="col-num" title="Pontos">Pts</th>
-                <th class="col-num" title="Jogos">J</th>
-                <th class="col-num hidden-xs" title="Vitórias">V</th>
-                <th class="col-num hidden-xs" title="Empates">E</th>
-                <th class="col-num hidden-xs" title="Derrotas">D</th>
-                <th class="col-num hidden-xs" title="Saldo de gols">SG</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="let row of gv.standings"
-                [class.advancing]="row.advancing"
-              >
-                <td class="col-pos">{{ row.pos }}</td>
-                <td class="col-team">
-                  <div class="col-team-inner">
-                    <img
-                      [src]="teamsById.get(row.teamId)?.logo"
-                      [alt]="teamsById.get(row.teamId)?.name"
-                      referrerpolicy="no-referrer"
-                    />
-                    <span>{{ teamsById.get(row.teamId)?.name }}</span>
-                  </div>
-                </td>
-                <td class="col-num pts">{{ row.points }}</td>
-                <td class="col-num">{{ row.played }}</td>
-                <td class="col-num hidden-xs">{{ row.won }}</td>
-                <td class="col-num hidden-xs">{{ row.drawn }}</td>
-                <td class="col-num hidden-xs">{{ row.lost }}</td>
-                <td class="col-num hidden-xs">{{ row.goalDiff > 0 ? '+' : '' }}{{ row.goalDiff }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="standings-col">
+          <!-- Tabela real -->
+          <div class="standings-panel card">
+            <div class="standings-header-row">
+              <span class="standings-badge real-badge">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+                Ao vivo
+              </span>
+              <h3 class="standings-title">Classificação</h3>
+            </div>
+            <table class="standings-table">
+              <thead>
+                <tr>
+                  <th class="col-pos">#</th>
+                  <th class="col-team">Seleção</th>
+                  <th class="col-num" title="Pontos">Pts</th>
+                  <th class="col-num" title="Jogos">J</th>
+                  <th class="col-num hidden-xs" title="Vitórias">V</th>
+                  <th class="col-num hidden-xs" title="Empates">E</th>
+                  <th class="col-num hidden-xs" title="Derrotas">D</th>
+                  <th class="col-num hidden-xs" title="Saldo de gols">SG</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let row of gv.standings"
+                  [class.advancing]="row.advancing"
+                >
+                  <td class="col-pos">{{ row.pos }}</td>
+                  <td class="col-team">
+                    <div class="col-team-inner">
+                      <img
+                        [src]="teamsById.get(row.teamId)?.logo"
+                        [alt]="teamsById.get(row.teamId)?.name"
+                        referrerpolicy="no-referrer"
+                      />
+                      <span>{{ teamsById.get(row.teamId)?.name }}</span>
+                    </div>
+                  </td>
+                  <td class="col-num pts">{{ row.points }}</td>
+                  <td class="col-num">{{ row.played }}</td>
+                  <td class="col-num hidden-xs">{{ row.won }}</td>
+                  <td class="col-num hidden-xs">{{ row.drawn }}</td>
+                  <td class="col-num hidden-xs">{{ row.lost }}</td>
+                  <td class="col-num hidden-xs">
+                    {{ row.goalDiff > 0 ? "+" : "" }}{{ row.goalDiff }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Tabela de previsão -->
+          <div class="standings-panel forecast-panel card">
+            <div class="standings-header-row">
+              <span class="standings-badge forecast-badge">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                Simulação
+              </span>
+              <h3 class="standings-title forecast-title">Sua Simulação</h3>
+            </div>
+            <p class="forecast-desc" *ngIf="!forecastHasPalpites">
+              Preencha palpites para simular a classificação.
+            </p>
+            <table
+              class="standings-table forecast-table"
+              *ngIf="forecastHasPalpites"
+            >
+              <thead>
+                <tr>
+                  <th class="col-pos">#</th>
+                  <th class="col-team">Seleção</th>
+                  <th class="col-num" title="Pontos">Pts</th>
+                  <th class="col-num" title="Jogos">J</th>
+                  <th class="col-num hidden-xs" title="Vitórias">V</th>
+                  <th class="col-num hidden-xs" title="Empates">E</th>
+                  <th class="col-num hidden-xs" title="Derrotas">D</th>
+                  <th class="col-num hidden-xs" title="Saldo de gols">SG</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let row of selectedGroupForecast"
+                  [class.forecast-advancing]="row.advancing"
+                >
+                  <td class="col-pos forecast-pos">{{ row.pos }}</td>
+                  <td class="col-team">
+                    <div class="col-team-inner">
+                      <img
+                        [src]="teamsById.get(row.teamId)?.logo"
+                        [alt]="teamsById.get(row.teamId)?.name"
+                        referrerpolicy="no-referrer"
+                      />
+                      <span>{{ teamsById.get(row.teamId)?.name }}</span>
+                    </div>
+                  </td>
+                  <td class="col-num pts forecast-pts">{{ row.points }}</td>
+                  <td class="col-num">{{ row.played }}</td>
+                  <td class="col-num hidden-xs">{{ row.won }}</td>
+                  <td class="col-num hidden-xs">{{ row.drawn }}</td>
+                  <td class="col-num hidden-xs">{{ row.lost }}</td>
+                  <td class="col-num hidden-xs">
+                    {{ row.goalDiff > 0 ? "+" : "" }}{{ row.goalDiff }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="matches-col">

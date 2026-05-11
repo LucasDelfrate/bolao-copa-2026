@@ -501,8 +501,6 @@
 
 /* Standings panel */
 .standings-panel {
-  position: sticky;
-  top: 80px;
   padding: 20px;
 }
 
@@ -512,7 +510,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-secondary);
-  margin-bottom: 14px;
+  margin: 0;
 }
 
 .standings-table {
@@ -601,6 +599,104 @@
   color: var(--text-primary);
 }
 
+/* Standings column (wraps real + forecast) */
+.standings-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 80px;
+  align-self: start;
+}
+
+.standings-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  line-height: 1;
+}
+
+.standings-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.real-badge {
+  background: rgba(0, 104, 71, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.forecast-badge {
+  background: rgba(99, 102, 241, 0.18);
+  color: #a5b4fc;
+  border: 1px solid rgba(165, 180, 252, 0.3);
+}
+
+/* Forecast panel */
+.forecast-panel {
+  border: 1px dashed rgba(99, 102, 241, 0.4) !important;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.04) 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.forecast-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 12px,
+    rgba(99, 102, 241, 0.02) 12px,
+    rgba(99, 102, 241, 0.02) 13px
+  );
+  pointer-events: none;
+}
+
+.forecast-title {
+  color: #a5b4fc !important;
+}
+
+.forecast-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 16px 0 8px;
+  font-style: italic;
+}
+
+.forecast-table tbody tr.forecast-advancing td.forecast-pos {
+  border-left: 3px solid #818cf8;
+}
+
+.forecast-table .forecast-pts {
+  color: #a5b4fc !important;
+}
+
+.forecast-table thead th {
+  color: rgba(165, 180, 252, 0.6) !important;
+  border-bottom-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+.forecast-table tbody tr {
+  border-bottom-color: rgba(99, 102, 241, 0.08) !important;
+}
+
+.forecast-table tbody tr:hover {
+  background: rgba(99, 102, 241, 0.06) !important;
+}
+
 /* Matches column */
 .matches-col {
   min-width: 0;
@@ -616,7 +712,7 @@
   .group-layout {
     grid-template-columns: 1fr;
   }
-  .standings-panel {
+  .standings-col {
     position: static;
   }
 }

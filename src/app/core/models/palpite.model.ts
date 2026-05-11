@@ -12,6 +12,7 @@ export interface Palpite {
 
 export interface BracketBonus {
   uid: string;
+  groupChampionTeamId?: string;
   championTeamId?: string;
   runnerUpTeamId?: string;
   thirdPlaceTeamId?: string;

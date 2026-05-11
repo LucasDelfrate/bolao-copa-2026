@@ -36,6 +36,49 @@
     </div>
   </div>
 
+  <!-- Usuários -->
+  <div class="users-section">
+    <h3>Participantes <span class="count">{{ users.length }}</span></h3>
+    <p class="section-sub">Remover um usuário apaga o documento no Firestore, todos os palpites e previsões do mata-mata.</p>
+
+    <div *ngIf="!users.length" class="empty">Nenhum usuário cadastrado.</div>
+
+    <div class="users-list" *ngIf="users.length">
+      <div *ngFor="let u of users" class="user-row card">
+        <img [src]="u.photoURL || 'assets/avatar-placeholder.png'" class="user-avatar" alt="" />
+        <div class="user-info">
+          <span class="user-name">{{ u.displayName }}</span>
+          <span class="user-email">{{ u.email }}</span>
+        </div>
+        <div class="user-badges">
+          <span class="badge badge-red" *ngIf="u.isAdmin">Admin</span>
+          <span class="badge badge-green" *ngIf="u.isApproved && !u.isAdmin">Ativo</span>
+          <span class="badge badge-muted" *ngIf="!u.isApproved && !u.isAdmin">Pendente</span>
+        </div>
+        <button class="btn btn-danger btn-sm" (click)="openRemoveModal(u)" [disabled]="!!u.isAdmin">
+          🗑️ Remover
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal confirmar remoção -->
+  <div class="modal-backdrop" *ngIf="removeTarget" (click)="closeRemoveModal()">
+    <div class="modal-box card" (click)="$event.stopPropagation()">
+      <h3 class="modal-title">Remover participante?</h3>
+      <p class="modal-body">
+        Isso vai apagar <strong>{{ removeTarget.displayName }}</strong> e todos os palpites e previsões associados. Esta ação não pode ser desfeita.
+      </p>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="closeRemoveModal()" [disabled]="removeLoading">Cancelar</button>
+        <button class="btn btn-danger" (click)="confirmRemove()" [disabled]="removeLoading">
+          <span *ngIf="!removeLoading">Confirmar remoção</span>
+          <span *ngIf="removeLoading">Removendo…</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Lista de códigos -->
   <div class="codes-section">
     <h3>Códigos gerados <span class="count">{{ codes.length }}</span></h3>

@@ -24,14 +24,21 @@
 }
 
 .brand-mark {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  font-size: 1.4rem;
-  background: var(--gradient-hero);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-glow-green);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-glow-green), 0 2px 12px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+  background: #006847;
+}
+
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  display: block;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 .brand-text {
