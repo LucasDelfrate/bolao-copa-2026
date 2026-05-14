@@ -36,6 +36,31 @@
     </div>
   </div>
 
+  <!-- Modo teste -->
+  <div class="test-mode-card card" [class.test-active]="testMode">
+    <div class="test-mode-info">
+      <div class="test-mode-label">
+        <span class="test-mode-icon">🧪</span>
+        <div>
+          <strong>Modo teste</strong>
+          <small>Permite entrada com o código <code>TESTE</code> sem consumir convites</small>
+        </div>
+      </div>
+      <span class="test-mode-status" [class.active]="testMode">
+        {{ testMode ? 'Ativo' : 'Inativo' }}
+      </span>
+    </div>
+    <button
+      class="toggle-switch"
+      [class.on]="testMode"
+      [disabled]="testModeLoading"
+      (click)="toggleTestMode()"
+      [attr.aria-label]="testMode ? 'Desativar modo teste' : 'Ativar modo teste'"
+    >
+      <span class="toggle-thumb"></span>
+    </button>
+  </div>
+
   <!-- Usuários -->
   <div class="users-section">
     <h3>Participantes <span class="count">{{ users.length }}</span></h3>

@@ -20,6 +20,9 @@ export class AdminComponent implements OnInit {
   removeTarget: AppUser | null = null;
   removeLoading = false;
 
+  testMode = false;
+  testModeLoading = false;
+
   constructor(
     private invite: InviteService,
     private afs: AngularFirestore,
@@ -32,6 +35,7 @@ export class AdminComponent implements OnInit {
       .collection<AppUser>('users', (ref) => ref.orderBy('displayName'))
       .valueChanges()
       .subscribe((users) => (this.users = users));
+    this.invite.getTestMode().subscribe((enabled) => (this.testMode = enabled));
   }
 
   async generate(): Promise<void> {
@@ -63,6 +67,15 @@ export class AdminComponent implements OnInit {
 
   trackCode(_i: number, c: InviteCode): string {
     return c.code;
+  }
+
+  async toggleTestMode(): Promise<void> {
+    this.testModeLoading = true;
+    try {
+      await this.invite.setTestMode(!this.testMode);
+    } finally {
+      this.testModeLoading = false;
+    }
   }
 
   openRemoveModal(user: AppUser): void {

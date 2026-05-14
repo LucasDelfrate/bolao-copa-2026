@@ -1,11 +1,24 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { InviteCode } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class InviteService {
+  private readonly TEST_CODE = 'TESTE';
+
   constructor(private afs: AngularFirestore) {}
+
+  getTestMode(): Observable<boolean> {
+    return this.afs
+      .collection('config').doc<{ enabled: boolean }>('testMode')
+      .valueChanges()
+      .pipe(map((d) => !!d?.enabled));
+  }
+
+  async setTestMode(enabled: boolean): Promise<void> {
+    await this.afs.collection('config').doc('testMode').set({ enabled });
+  }
 
   getAllCodes(): Observable<InviteCode[]> {
     return this.afs
@@ -35,7 +48,20 @@ export class InviteService {
     uid: string,
     displayName: string,
   ): Promise<{ ok: boolean; error?: string }> {
-    const ref = this.afs.collection('inviteCodes').doc<InviteCode>(code.trim().toUpperCase());
+    const normalized = code.trim().toUpperCase();
+
+    // Modo teste: código "TESTE" aprovado diretamente se habilitado
+    if (normalized === this.TEST_CODE) {
+      const testSnap = await this.afs.collection('config').doc('testMode').get().toPromise();
+      const testEnabled = !!(testSnap?.data() as any)?.enabled;
+      if (!testEnabled) {
+        return { ok: false, error: 'Código inválido.' };
+      }
+      await this.afs.collection('users').doc(uid).update({ isApproved: true });
+      return { ok: true };
+    }
+
+    const ref = this.afs.collection('inviteCodes').doc<InviteCode>(normalized);
     const snap = await ref.get().toPromise();
 
     if (!snap || !snap.exists) {
@@ -48,9 +74,8 @@ export class InviteService {
       return { ok: false, error: 'Este código já foi utilizado.' };
     }
 
-    // Marca o código como usado e aprova o usuário em transação
     await this.afs.firestore.runTransaction(async (tx) => {
-      const codeRef = this.afs.firestore.collection('inviteCodes').doc(code.trim().toUpperCase());
+      const codeRef = this.afs.firestore.collection('inviteCodes').doc(normalized);
       const userRef = this.afs.firestore.collection('users').doc(uid);
       tx.update(codeRef, {
         usedAt: Date.now(),
